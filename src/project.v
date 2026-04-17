@@ -123,9 +123,12 @@ module tt_um_pakesson_vga_rocket (
   reg [9:0] flame_half_w;
   reg [9:0] booster_flame_half_w;
   reg star_bit;
+
   wire [9:0] scene_y = y - scroll_px;
   wire scene_y_valid = (y >= scroll_px);
+
   wire [9:0] star_scene_y = scene_y;
+
   wire flame_flicker = frame_count[1] ^ frame_count[3] ^ x[2] ^ y[1];
 
   wire [9:0] main_body_y_off = (stage == ST_SPACE) ? {1'b0, frame_count} : 10'd0;
@@ -161,7 +164,9 @@ module tt_um_pakesson_vga_rocket (
   wire [9:0] booster_body_bottom = 10'd400 + booster_y_off;
   wire [9:0] booster_nose_top = 10'd190 + booster_y_off;
   wire [9:0] booster_flame_top = 10'd400 + booster_y_off;
+
   wire in_space = (stage >= ST_SPACE_FADE);
+  wire show_end_text = (stage == ST_SPACE) && (frame_count >= 9'd340);
 
   always @* begin
     nose_half_w = 10'd0;
@@ -299,6 +304,51 @@ module tt_um_pakesson_vga_rocket (
       pix_r = 2'd3;
       pix_g = 2'd3;
       pix_b = 2'd3;
+    end
+
+    // End text: SPASIC
+    if (show_end_text) begin
+      if (
+          // S
+          (((x >= 10'd180) && (x < 10'd220) && (y >= 10'd24) && (y < 10'd32)) ||
+           ((x >= 10'd180) && (x < 10'd220) && (y >= 10'd52) && (y < 10'd60)) ||
+           ((x >= 10'd180) && (x < 10'd220) && (y >= 10'd80) && (y < 10'd88)) ||
+           ((x >= 10'd180) && (x < 10'd188) && (y >= 10'd24) && (y < 10'd56)) ||
+           ((x >= 10'd212) && (x < 10'd220) && (y >= 10'd56) && (y < 10'd88))) ||
+
+          // P
+          ((x >= 10'd228) && (x < 10'd236) && (y >= 10'd24) && (y < 10'd88)) ||
+          ((x >= 10'd228) && (x < 10'd268) && (y >= 10'd24) && (y < 10'd32)) ||
+          ((x >= 10'd228) && (x < 10'd268) && (y >= 10'd52) && (y < 10'd60)) ||
+          ((x >= 10'd260) && (x < 10'd268) && (y >= 10'd24) && (y < 10'd60)) ||
+
+          // A
+          ((x >= 10'd276) && (x < 10'd284) && (y >= 10'd24) && (y < 10'd88)) ||
+          ((x >= 10'd308) && (x < 10'd316) && (y >= 10'd24) && (y < 10'd88)) ||
+          ((x >= 10'd276) && (x < 10'd316) && (y >= 10'd24) && (y < 10'd32)) ||
+          ((x >= 10'd276) && (x < 10'd316) && (y >= 10'd52) && (y < 10'd60)) ||
+
+          // S
+          (((x >= 10'd324) && (x < 10'd364) && (y >= 10'd24) && (y < 10'd32)) ||
+           ((x >= 10'd324) && (x < 10'd364) && (y >= 10'd52) && (y < 10'd60)) ||
+           ((x >= 10'd324) && (x < 10'd364) && (y >= 10'd80) && (y < 10'd88)) ||
+           ((x >= 10'd324) && (x < 10'd332) && (y >= 10'd24) && (y < 10'd56)) ||
+           ((x >= 10'd356) && (x < 10'd364) && (y >= 10'd56) && (y < 10'd88))) ||
+
+          // I
+          ((x >= 10'd372) && (x < 10'd412) && (y >= 10'd24) && (y < 10'd32)) ||
+          ((x >= 10'd372) && (x < 10'd412) && (y >= 10'd80) && (y < 10'd88)) ||
+          ((x >= 10'd388) && (x < 10'd396) && (y >= 10'd24) && (y < 10'd88)) ||
+
+          // C
+          ((x >= 10'd420) && (x < 10'd460) && (y >= 10'd24) && (y < 10'd32)) ||
+          ((x >= 10'd420) && (x < 10'd460) && (y >= 10'd80) && (y < 10'd88)) ||
+          ((x >= 10'd420) && (x < 10'd428) && (y >= 10'd24) && (y < 10'd88))
+         ) begin
+        pix_r = 2'd3;
+        pix_g = 2'd3;
+        pix_b = 2'd3;
+      end
     end
 
     if (!video_active) begin
