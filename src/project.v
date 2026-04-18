@@ -132,6 +132,9 @@ module tt_um_pakesson_vga_rocket (
 
   wire [3:0] prev_stage = (stage == ST_PAD_IDLE) ? ST_PAD_IDLE : stage - 1'b1;
 
+  wire [9:0] center_dx = (x >= 10'd320) ? (x - 10'd320) : (10'd320 - x);
+  wire [9:0] booster_center_dx = (center_dx >= 10'd50) ? (center_dx - 10'd50) : (10'd50 - center_dx);
+
   wire transition_active = (stage != ST_PAD_IDLE) && (frame_count < 9'd60);
   wire [9:0] transition_y = {frame_count, 1'b0} + {frame_count, 2'b0} + {frame_count, 3'b0};
   wire use_prev_bg = transition_active && (y >= transition_y);
@@ -199,14 +202,7 @@ module tt_um_pakesson_vga_rocket (
 
     // Side boosters
     if (boosters_visible) begin
-      if ((x >= 10'd356) && (x <= 10'd384) &&
-          (y >= booster_body_top) && (y <= booster_body_bottom)) begin
-        pix_r = 2'd2;
-        pix_g = 2'd2;
-        pix_b = 2'd2;
-      end
-
-      if ((x >= 10'd256) && (x <= 10'd284) &&
+      if ((booster_center_dx <= 10'd14) &&
           (y >= booster_body_top) && (y <= booster_body_bottom)) begin
         pix_r = 2'd2;
         pix_g = 2'd2;
@@ -216,12 +212,7 @@ module tt_um_pakesson_vga_rocket (
       // Booster nose cones
       if ((y >= booster_nose_top) && (y < booster_body_top)) begin
         booster_nose_half_w = (y - booster_nose_top) >> 1;
-        if ((x >= (10'd270 - booster_nose_half_w)) && (x <= (10'd270 + booster_nose_half_w))) begin
-          pix_r = 2'd3;
-          pix_g = 2'd3;
-          pix_b = 2'd3;
-        end
-        if ((x >= (10'd370 - booster_nose_half_w)) && (x <= (10'd370 + booster_nose_half_w))) begin
+        if (booster_center_dx <= booster_nose_half_w) begin
           pix_r = 2'd3;
           pix_g = 2'd3;
           pix_b = 2'd3;
@@ -259,13 +250,7 @@ module tt_um_pakesson_vga_rocket (
       if (flame_flicker)
         booster_flame_half_w = booster_flame_half_w + 10'd2;
 
-      if ((x >= (10'd270 - booster_flame_half_w)) && (x <= (10'd270 + booster_flame_half_w))) begin
-        pix_r = 2'd3;
-        pix_g = 2'd2;
-        pix_b = 2'd0;
-      end
-
-      if ((x >= (10'd370 - booster_flame_half_w)) && (x <= (10'd370 + booster_flame_half_w))) begin
+      if (booster_center_dx <= booster_flame_half_w) begin
         pix_r = 2'd3;
         pix_g = 2'd2;
         pix_b = 2'd0;
