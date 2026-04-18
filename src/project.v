@@ -191,7 +191,7 @@ module tt_um_pakesson_vga_rocket (
     end
 
     // Main rocket body
-    if ((x >= 10'd286) && (x <= 10'd354) &&
+    if ((center_dx <= 9'd34) &&
         (y >= main_body_top) && (y <= main_body_bottom)) begin
       pix_r = 2'd2;
       pix_g = 2'd1;
@@ -201,7 +201,7 @@ module tt_um_pakesson_vga_rocket (
     // Main rocket nose cone
     if ((y >= main_nose_top) && (y < main_nose_bottom)) begin
       nose_half_w = y_from_main_nose_top >> 1;
-      if ((x >= (10'd320 - nose_half_w)) && (x <= (10'd320 + nose_half_w))) begin
+      if (center_dx <= nose_half_w) begin
         pix_r = 2'd3;
         pix_g = 2'd3;
         pix_b = 2'd3;
@@ -234,13 +234,12 @@ module tt_um_pakesson_vga_rocket (
       if (flame_flicker)
         flame_half_w = flame_half_w + 10'd3;
 
-      if ((x >= (10'd320 - flame_half_w)) && (x <= (10'd320 + flame_half_w))) begin
-        if ((x >= 10'd314) && (x <= 10'd326) && (y < 10'd432)) begin
+      if (center_dx <= flame_half_w) begin
+        if ((center_dx <= 9'd6) && (y < 10'd432)) begin
           pix_r = 2'd3;
           pix_g = 2'd3;
           pix_b = 2'd3;
-        end else if ((x >= (10'd320 - (flame_half_w >> 1))) &&
-                     (x <= (10'd320 + (flame_half_w >> 1)))) begin
+        end else if (center_dx <= (flame_half_w >> 1)) begin
           pix_r = 2'd3;
           pix_g = 2'd3;
           pix_b = 2'd0;
