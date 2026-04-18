@@ -118,7 +118,7 @@ module tt_um_pakesson_vga_rocket (
   wire [9:0] scene_y = y - scroll_px;
   wire scene_y_valid = (y >= scroll_px);
 
-  wire [9:0] star_scene_y = scene_y;
+  wire [7:0] star_scene_y = scene_y[7:0];
 
   wire flame_flicker = frame_count[1] ^ frame_count[3] ^ x[2] ^ y[1];
 
@@ -159,7 +159,7 @@ module tt_um_pakesson_vga_rocket (
   wire [6:0] y_from_main_flame_top = y[6:0] - 7'd8;
   wire [5:0] y_from_booster_flame_top = y[5:0] - booster_flame_top[5:0];
 
-  wire in_space = (stage >= ST_SPACE_FADE);
+  wire in_space = (stage >= ST_SPACE_FADE) && !use_prev_bg;
   wire show_end_text = (stage == ST_SPACE) && (frame_count >= 9'd340);
 
   always @* begin
@@ -188,6 +188,22 @@ module tt_um_pakesson_vga_rocket (
       pix_r = 2'd1;
       pix_g = 2'd2;
       pix_b = 2'd0;
+    end
+
+    // Stars
+    star_bit = ((x == 10'd74)  && (star_scene_y == 8'd41))  ||
+               ((x == 10'd153) && (star_scene_y == 8'd97))  ||
+               ((x == 10'd231) && (star_scene_y == 8'd176)) ||
+               ((x == 10'd318) && (star_scene_y == 8'd58))  ||
+               ((x == 10'd402) && (star_scene_y == 8'd212)) ||
+               ((x == 10'd489) && (star_scene_y == 8'd123)) ||
+               ((x == 10'd557) && (star_scene_y == 8'd251)) ||
+               ((x == 10'd612) && (star_scene_y == 8'd33));
+
+    if (in_space && star_bit) begin
+      pix_r = 2'd3;
+      pix_g = 2'd3;
+      pix_b = 2'd3;
     end
 
     // Main rocket body
@@ -262,23 +278,6 @@ module tt_um_pakesson_vga_rocket (
           pix_b = 2'd0;
         end
       end
-    end
-
-    // Stars
-    // TODO: This is not working that well...
-    star_bit = ((x == 10'd74)  && (star_scene_y == 10'd41))  ||
-               ((x == 10'd153) && (star_scene_y == 10'd97))  ||
-               ((x == 10'd231) && (star_scene_y == 10'd176)) ||
-               ((x == 10'd318) && (star_scene_y == 10'd58))  ||
-               ((x == 10'd402) && (star_scene_y == 10'd212)) ||
-               ((x == 10'd489) && (star_scene_y == 10'd123)) ||
-               ((x == 10'd557) && (star_scene_y == 10'd251)) ||
-               ((x == 10'd612) && (star_scene_y == 10'd33));
-
-    if (in_space && star_bit) begin
-      pix_r = 2'd3;
-      pix_g = 2'd3;
-      pix_b = 2'd3;
     end
 
     // End text: SPASIC
