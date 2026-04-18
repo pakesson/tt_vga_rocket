@@ -109,10 +109,10 @@ module tt_um_pakesson_vga_rocket (
 
   reg [1:0] bg_r, bg_g, bg_b;
   reg [1:0] pix_r, pix_g, pix_b;
-  reg [9:0] nose_half_w;
-  reg [9:0] booster_nose_half_w;
-  reg [9:0] flame_half_w;
-  reg [9:0] booster_flame_half_w;
+  reg [5:0] nose_half_w;
+  reg [3:0] booster_nose_half_w;
+  reg [5:0] flame_half_w;
+  reg [4:0] booster_flame_half_w;
   reg star_bit;
 
   wire [9:0] scene_y = y - scroll_px;
@@ -123,7 +123,7 @@ module tt_um_pakesson_vga_rocket (
   wire flame_flicker = frame_count[1] ^ frame_count[3] ^ x[2] ^ y[1];
 
   wire [9:0] main_body_y_off = (stage == ST_SPACE) ? {1'b0, frame_count} : 10'd0;
-  wire [9:0] main_nose_y_off = (stage == ST_SPACE) ? ((frame_count > 9'd115) ? 10'd115 : {1'b0, frame_count}) : 10'd0;
+  wire [6:0] main_nose_y_off = (stage == ST_SPACE) ? ((frame_count > 9'd115) ? 7'd115 : frame_count[6:0]) : 7'd0;
   wire [9:0] booster_y_off = (stage == ST_MID_SKY) ? {frame_count, 1'b0} : 10'd0;
 
   wire boosters_visible = (stage <= ST_MID_SKY);
@@ -132,15 +132,14 @@ module tt_um_pakesson_vga_rocket (
 
   wire [3:0] prev_stage = (stage == ST_PAD_IDLE) ? ST_PAD_IDLE : stage - 1'b1;
 
-  wire [9:0] center_dx = (x >= 10'd320) ? (x - 10'd320) : (10'd320 - x);
-  wire [9:0] booster_center_dx = (center_dx >= 10'd50) ? (center_dx - 10'd50) : (10'd50 - center_dx);
-
-  wire [9:0] frame_count_10 = {1'b0, frame_count};
-  wire [9:0] frame_count_x2 = frame_count_10 << 1;
-  wire [9:0] frame_count_x6 = frame_count_x2 + (frame_count_10 << 2);
+  wire [8:0] center_dx = (x >= 10'd320) ? (x - 10'd320) : (10'd320 - x);
+  wire [8:0] booster_center_dx = (center_dx >= 9'd50) ? (center_dx - 9'd50) : (9'd50 - center_dx);
 
   wire transition_active = (stage != ST_PAD_IDLE) && (frame_count < 9'd60);
-  wire [9:0] transition_y = frame_count_x6 + (frame_count_10 << 3);
+  wire [5:0] transition_frame = transition_active ? frame_count[5:0] : 6'd0;
+  wire [6:0] transition_x2 = {transition_frame, 1'b0};
+  wire [8:0] transition_x6 = {2'b00, transition_x2} + {1'b0, transition_frame, 2'b00};
+  wire [9:0] transition_y = {1'b0, transition_x6} + {1'b0, transition_frame, 3'b000};
   wire use_prev_bg = transition_active && (y >= transition_y);
 
   wire [5:0] bg_cur_rgb = stage_rgb(stage);
@@ -155,10 +154,10 @@ module tt_um_pakesson_vga_rocket (
   wire [9:0] booster_nose_top = 10'd190 + booster_y_off;
   wire [9:0] booster_flame_top = 10'd400 + booster_y_off;
 
-  wire [9:0] y_from_main_nose_top = y - main_nose_top;
-  wire [9:0] y_from_booster_nose_top = y - booster_nose_top;
-  wire [9:0] y_from_main_flame_top = y - 10'd392;
-  wire [9:0] y_from_booster_flame_top = y - booster_flame_top;
+  wire [6:0] y_from_main_nose_top = y[6:0] - main_nose_top[6:0];
+  wire [4:0] y_from_booster_nose_top = y[4:0] - booster_nose_top[4:0];
+  wire [6:0] y_from_main_flame_top = y[6:0] - 7'd8;
+  wire [5:0] y_from_booster_flame_top = y[5:0] - booster_flame_top[5:0];
 
   wire in_space = (stage >= ST_SPACE_FADE);
   wire show_end_text = (stage == ST_SPACE) && (frame_count >= 9'd340);
