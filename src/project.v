@@ -228,6 +228,19 @@ module tt_um_pakesson_vga_rocket (
       end
     end
 
+    // Booster flames (disabled once boosters separate)
+    if (booster_flame_on && (y >= booster_flame_top) && (y < (10'd456 + booster_y_off))) begin
+      booster_flame_half_w = 10'd4 + (y_from_booster_flame_top >> 2);
+      if (flame_flicker)
+        booster_flame_half_w = booster_flame_half_w + 10'd2;
+
+      if (booster_center_dx <= booster_flame_half_w) begin
+        pix_r = 2'd3;
+        pix_g = 2'd2;
+        pix_b = 2'd0;
+      end
+    end
+
     // Main engine flame
     if (main_flame_on && (y >= 10'd392) && (y < 10'd460)) begin
       flame_half_w = 10'd6 + (y_from_main_flame_top >> 1);
@@ -248,19 +261,6 @@ module tt_um_pakesson_vga_rocket (
           pix_g = 2'd1;
           pix_b = 2'd0;
         end
-      end
-    end
-
-    // Booster flames (disabled once boosters separate)
-    if (booster_flame_on && (y >= booster_flame_top) && (y < (10'd456 + booster_y_off))) begin
-      booster_flame_half_w = 10'd4 + (y_from_booster_flame_top >> 2);
-      if (flame_flicker)
-        booster_flame_half_w = booster_flame_half_w + 10'd2;
-
-      if (booster_center_dx <= booster_flame_half_w) begin
-        pix_r = 2'd3;
-        pix_g = 2'd2;
-        pix_b = 2'd0;
       end
     end
 
