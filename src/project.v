@@ -82,15 +82,7 @@ module tt_um_pakesson_vga_rocket (
 
   wire launched = (stage != ST_PAD_IDLE);
 
-  wire [3:0] stage_next = (stage == ST_PAD_IDLE)     ? ST_LIGHT_ASCENT :
-                          (stage == ST_LIGHT_ASCENT) ? ST_LOW_SKY :
-                          (stage == ST_LOW_SKY)      ? ST_CLOUDS :
-                          (stage == ST_CLOUDS)       ? ST_MID_SKY :
-                          (stage == ST_MID_SKY)      ? ST_HIGH_SKY :
-                          (stage == ST_HIGH_SKY)     ? ST_DARK_ASCENT :
-                          (stage == ST_DARK_ASCENT)  ? ST_SPACE_FADE :
-                          (stage == ST_SPACE_FADE)   ? ST_SPACE :
-                                                       ST_SPACE;
+  wire [3:0] stage_next = (stage == ST_SPACE) ? ST_SPACE : stage + 1'b1;
 
   wire [8:0] stage_frame_max = (stage == ST_SPACE) ? STAGE_FREE_RUN :
                                                     STAGE_FRAMES;
@@ -101,12 +93,11 @@ module tt_um_pakesson_vga_rocket (
       stage <= ST_PAD_IDLE;
       scroll_px <= 10'd0;
     end else if (frame_start) begin
-      if ((stage == ST_SPACE) && (frame_count == STAGE_FREE_RUN)) begin
-        frame_count <= frame_count;
-        stage <= ST_SPACE;
-      end else if (frame_count == stage_frame_max) begin
-        frame_count <= 9'd0;
-        stage <= stage_next;
+      if (frame_count == stage_frame_max) begin
+        if (stage != ST_SPACE) begin
+          frame_count <= 9'd0;
+          stage <= stage_next;
+        end
       end else begin
         frame_count <= frame_count + 9'd1;
       end
@@ -139,15 +130,7 @@ module tt_um_pakesson_vga_rocket (
   wire main_flame_on = launched && (stage < ST_SPACE);
   wire booster_flame_on = launched && (stage < ST_MID_SKY);
 
-  wire [3:0] prev_stage = (stage == ST_LIGHT_ASCENT) ? ST_PAD_IDLE :
-                          (stage == ST_LOW_SKY)      ? ST_LIGHT_ASCENT :
-                          (stage == ST_CLOUDS)       ? ST_LOW_SKY :
-                          (stage == ST_MID_SKY)      ? ST_CLOUDS :
-                          (stage == ST_HIGH_SKY)     ? ST_MID_SKY :
-                          (stage == ST_DARK_ASCENT)  ? ST_HIGH_SKY :
-                          (stage == ST_SPACE_FADE)   ? ST_DARK_ASCENT :
-                          (stage == ST_SPACE)        ? ST_SPACE_FADE :
-                                                      ST_PAD_IDLE;
+  wire [3:0] prev_stage = (stage == ST_PAD_IDLE) ? ST_PAD_IDLE : stage - 1'b1;
 
   wire transition_active = (stage != ST_PAD_IDLE) && (frame_count < 9'd60);
   wire [9:0] transition_y = {frame_count, 1'b0} + {frame_count, 2'b0} + {frame_count, 3'b0};
