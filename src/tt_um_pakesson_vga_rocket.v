@@ -132,8 +132,7 @@ module tt_um_pakesson_vga_rocket (
 
   wire [3:0] prev_stage = (stage == ST_PAD_IDLE) ? ST_PAD_IDLE : stage - 1'b1;
 
-  wire [9:0] center_dx_10 = (x >= 10'd320) ? (x - 10'd320) : (10'd320 - x);
-  wire [8:0] center_dx = center_dx_10[8:0];
+  wire [8:0] center_dx = 9'((x >= 10'd320) ? (x - 10'd320) : (10'd320 - x));
   wire [8:0] booster_center_dx = (center_dx >= 9'd50) ? (center_dx - 9'd50) : (9'd50 - center_dx);
 
   wire transition_active = (stage != ST_PAD_IDLE) && (frame_count < 9'd60);
@@ -148,8 +147,8 @@ module tt_um_pakesson_vga_rocket (
 
   wire [9:0] main_body_top = 10'd160 + main_body_y_off;
   wire [9:0] main_body_bottom = 10'd392 + main_body_y_off;
-  wire [9:0] main_nose_top = 10'd90 + {3'd0, main_nose_y_off};
-  wire [9:0] main_nose_bottom = 10'd160 + {3'd0, main_nose_y_off};
+  wire [9:0] main_nose_top = 10'd90 + 10'(main_nose_y_off);
+  wire [9:0] main_nose_bottom = 10'd160 + 10'(main_nose_y_off);
   wire [9:0] booster_body_top = 10'd220 + booster_y_off;
   wire [9:0] booster_body_bottom = 10'd400 + booster_y_off;
   wire [9:0] booster_nose_top = 10'd190 + booster_y_off;
@@ -218,7 +217,7 @@ module tt_um_pakesson_vga_rocket (
     // Main rocket nose cone
     if ((y >= main_nose_top) && (y < main_nose_bottom)) begin
       nose_half_w = y_from_main_nose_top[6:1];
-      if (center_dx <= {3'd0, nose_half_w}) begin
+      if (center_dx <= 9'(nose_half_w)) begin
         pix_r = 2'd3;
         pix_g = 2'd3;
         pix_b = 2'd3;
@@ -237,7 +236,7 @@ module tt_um_pakesson_vga_rocket (
       // Booster nose cones
       if ((y >= booster_nose_top) && (y < booster_body_top)) begin
         booster_nose_half_w = y_from_booster_nose_top[4:1];
-        if (booster_center_dx <= {5'd0, booster_nose_half_w}) begin
+        if (booster_center_dx <= 9'(booster_nose_half_w)) begin
           pix_r = 2'd3;
           pix_g = 2'd3;
           pix_b = 2'd3;
@@ -247,11 +246,11 @@ module tt_um_pakesson_vga_rocket (
 
     // Booster flames (disabled once boosters separate)
     if (booster_flame_on && (y >= booster_flame_top) && (y < (10'd456 + booster_y_off))) begin
-      booster_flame_half_w = 5'd4 + {1'b0, y_from_booster_flame_top[5:2]};
+      booster_flame_half_w = 5'(5'd4 + (y_from_booster_flame_top >> 2));
       if (flame_flicker)
         booster_flame_half_w = booster_flame_half_w + 5'd2;
 
-      if (booster_center_dx <= {4'd0, booster_flame_half_w}) begin
+      if (booster_center_dx <= 9'(booster_flame_half_w)) begin
         pix_r = 2'd3;
         pix_g = 2'd2;
         pix_b = 2'd0;
@@ -260,16 +259,16 @@ module tt_um_pakesson_vga_rocket (
 
     // Main engine flame
     if (main_flame_on && (y >= 10'd392) && (y < 10'd460)) begin
-      flame_half_w = 6'd6 + y_from_main_flame_top[6:1];
+      flame_half_w = 6'(6'd6 + (y_from_main_flame_top >> 1));
       if (flame_flicker)
         flame_half_w = flame_half_w + 6'd3;
 
-      if (center_dx <= {3'd0, flame_half_w}) begin
+      if (center_dx <= 9'(flame_half_w)) begin
         if ((center_dx <= 9'd6) && (y < 10'd432)) begin
           pix_r = 2'd3;
           pix_g = 2'd3;
           pix_b = 2'd3;
-        end else if (center_dx <= {4'd0, flame_half_w[5:1]}) begin
+        end else if (center_dx <= 9'(flame_half_w[5:1])) begin
           pix_r = 2'd3;
           pix_g = 2'd3;
           pix_b = 2'd0;
@@ -339,7 +338,6 @@ module tt_um_pakesson_vga_rocket (
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, ui_in, uio_in,
-                   center_dx_10[9],
                    y_from_main_nose_top[0],
                    y_from_booster_nose_top[0],
                    y_from_main_flame_top[0],
