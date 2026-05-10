@@ -32,8 +32,7 @@ I am not an artist, but the idea was to start out with something vaguely inspire
 The transitions between atmospheric "layers" are a bit abrupt, instead of a gradual fade, due to the limited palette.
 I am pretty happy with the stars scrolling by while in space, though.
 
-The final utlization (on one tile) ended up being just under 60%, but fixing timing violations took enough effort that I decided to skip trying to add any audio.
-
+The final utilization (on one tile) ended up being around 60%, but getting rid of the worst timing violations took enough effort that I decided to skip trying to add any audio.
 
 ## How it works
 
@@ -46,6 +45,9 @@ This results in a frame rate of exactly 60 Hz.
 
 Connect the VGA Pmod to a VGA monitor that supports 640x480 @ 59.94Hz (with a 25.175 MHz clock input).
 The demo is not interactive - so just wait and see if anything happens.
+
+![Photo 1 of the demo running on a display with VGA input](photo1.jpg)
+![Photo 2 of the demo running on a display with VGA input](photo2.jpg)
 
 ## External hardware
 
