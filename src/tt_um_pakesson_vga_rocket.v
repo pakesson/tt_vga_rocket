@@ -325,14 +325,21 @@ module tt_um_pakesson_vga_rocket (
       end
     end
 
-    if (!video_active) begin
-      r = 2'd0;
-      g = 2'd0;
-      b = 2'd0;
+  end
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      r <= 2'd0;
+      g <= 2'd0;
+      b <= 2'd0;
+    end else if (!video_active) begin
+      r <= 2'd0;
+      g <= 2'd0;
+      b <= 2'd0;
     end else begin
-      r = pix_r;
-      g = pix_g;
-      b = pix_b;
+      r <= pix_r;
+      g <= pix_g;
+      b <= pix_b;
     end
   end
 
