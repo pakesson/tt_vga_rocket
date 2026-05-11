@@ -14,7 +14,7 @@
 
 ![Collage of screenshots](docs/collage.png)
 
-- [Read the documentation for project](docs/info.md)
-- See the design in 3D in the [interactive GDS viewer](https://pakesson.github.io/tt_vga_rocket).
+- [Read the documentation for the project](docs/info.md)
+- Explore the design in 3D with the [interactive GDS viewer](https://pakesson.github.io/tt_vga_rocket).
 
 [![GDS render](https://pakesson.github.io/tt_vga_rocket/gds_render.png)](https://pakesson.github.io/tt_vga_rocket)
